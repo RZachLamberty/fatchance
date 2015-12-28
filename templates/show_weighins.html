@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    <form action="{{ url_for('add_weighin') }}" method=post class=add-entry>
+      <dl>
+        <dt>Username:
+        <dd><input type=text size=30 name=username>
+        <dt>Date:
+        <dd><input type=date size=30 name=weighdate></textarea>
+        <dt>Weight:
+        <dd><input type=number min=0 step="any" name=weight></textarea>
+        <dd><input type=submit value=Add>
+      </dl>
+    </form>
+  {% endif %}
+  <ul class=weighins>
+  {% for weighin in weighins %}
+    <li>User <em>{{ weighin.username }}</em> weighed {{ weighin.weight }} on {{ weighin.weighdate }}.
+  {% else %}
+    <li><em>Unbelievable. No entries here so far!</em>
+  {% endfor %}
+  </ul>
+{% endblock %}
