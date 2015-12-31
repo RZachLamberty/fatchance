@@ -10,7 +10,7 @@ development is using the following sources so far
 
 + [The official flask tutorial](http://flask.pocoo.org/docs/0.10/tutorial/)
 + [This flask + bootstrap tutorial](http://www.vertabelo.com/blog/technical-articles/web-app-development-with-flask-sqlalchemy-bootstrap-part-1)
-
++ [This python + postgresql tutorial](http://killtheyak.com/use-postgresql-with-django-flask/)
 
 Goal
 ----
