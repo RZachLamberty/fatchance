@@ -77,3 +77,23 @@ def logout():
     session.pop('logged_in', None)
     flash('You have been logged out')
     return redirect(url_for('show_weighins'))
+
+
+@app.route('/new_user', methods=['GET', 'POST'])
+def new_user():
+    error = None
+    if request.method == 'POST':
+        try:
+            # make sure they typed the same password both times
+            if not request.form['password'] == request.form['password2']:
+                raise auth.AuthenticationError("Passwords did not match")
+            auth.add_user(
+                username=request.form['username'],
+                password=request.form['password']
+            )
+            session['logged_in'] = True
+            flash('Your user name has been created!')
+            return redirect(url_for('show_weighins'))
+        except auth.AuthenticationError as error:
+            error = error
+    return render_template('new_user.html', error=error)
