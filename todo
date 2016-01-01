@@ -1,15 +1,16 @@
 + [DONE] make simplest version possible following flask tutorial instructions
 + [DONE] update to have multiple users (pre-allocated only for now)
-+ reorganize entire repo (take hints from http://gouthamanbalaraman.com/blog/flask-app-directory-structure.html)
-  + extract all db stuff into models.py
-  + auth into its own file
-+ update main page to have contest summary
-+ create user-specific page for each user's total summary
-+ replace sqlite with postgres
++ [DONE] create way for users to create themselves
++ [DONE] reorganize entire repo (take hints from http://gouthamanbalaraman.com/blog/flask-app-directory-structure.html)
+  + [DONE] extract all db stuff into models.py
+  + [DONE] auth into its own file
++ [DONE] replace sqlite with postgres
++ create postrgres bootstrap script
 + do passwords the right way (salting, etc; use http://blog.codinghorror.com/youre-probably-storing-passwords-incorrectly/)
 + update auth method(s)
-+ create way for users to create themselves
-+ better css (bootstrap, mainly)
++ update main page to have contest summary
++ create user-specific page for each user's total summary
++ better css (bootstrap that shit, mainly)
 + create way to wipe database
 + create nightly db bak script
 + default of the date form in show_weighins.html to today (look at http://stackoverflow.com/questions/6982692/html5-input-type-date-default-value-to-today)

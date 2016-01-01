@@ -23,7 +23,7 @@ CREATE DATABASE fatchance OWNER fatchance;
 BEGIN;
   CREATE TABLE users (
     username text PRIMARY KEY,
-    pwd text
+    password text
   );
 COMMIT;
 
@@ -43,7 +43,8 @@ GRANT ALL PRIVILEGES ON TABLE users TO fatchance;
 GRANT ALL PRIVILEGES ON TABLE weighins TO fatchance;
 COMMIT;
 
--- set up testing user
+-- set up testing users
 BEGIN;
+INSERT INTO users VALUES ('admin', 'password');
 INSERT INTO users VALUES ('zlamberty', 'bigdog13');
 COMMIT;

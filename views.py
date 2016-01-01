@@ -17,10 +17,10 @@ Usage:
 from flask import (abort, flash, url_for, redirect, render_template, request,
                    session)
 
+from fatchance import app
+
 import auth
 import model
-
-from fatchance import app
 
 
 # ----------------------------- #
@@ -29,13 +29,7 @@ from fatchance import app
 
 @app.route('/')
 def show_weighins():
-    q = (
-        'select username, weighdate, weight '
-        'from weighins '
-        'order by username, weighdate desc'
-    )
-    weighins = model.query_db(q)
-    return render_template('show_weighins.html', weighins=weighins)
+    return render_template('show_weighins.html', weighins=model.weighins())
 
 
 @app.route('/weighin', methods=['POST'])
@@ -43,14 +37,12 @@ def add_weighin():
     if not session.get('logged_in'):
         abort(401)
 
-    resp = model.query_db(
-        'insert into weighins (username, weighdate, weight) values (?, ?, ?)',
-        (
-            request.form['username'], request.form['weighdate'],
-            request.form['weight']
-        ),
-        commit=True
+    model.add_weighin(
+        username=request.form['username'],
+        weighdate=request.form['weighdate'],
+        weight=request.form['weight']
     )
+
     flash('New entry was successfully posted')
     return redirect(url_for('show_weighins'))
 

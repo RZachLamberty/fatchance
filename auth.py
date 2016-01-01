@@ -14,8 +14,6 @@ Usage:
 
 """
 
-import sqlite3
-
 import model
 
 
@@ -29,33 +27,17 @@ class AuthenticationError(Exception):
 
 def add_user(username, password):
     try:
-        resp = model.query_db(
-            query='insert into weighin_users (username, password) values (?, ?)',
-            args=(username, password),
-            commit=True
-        )
-    except sqlite3.IntegrityError:
+        model.add_user(username, password)
+    except model.INTEGRITY_ERROR:
         raise AuthenticationError("That user name already exists")
     except:
         raise
 
 
 def authenticate(username, password):
-    pws = model.query_db(
-        query='select count(*) ct from weighin_users where username == ? and password == ?',
-        args=(username, password),
-        one=True
-    )
-
-    if pws['ct'] == 0:
-        # check if user exist
-        userct = model.query_db(
-            query='select count(*) ct from weighin_users where username == ?',
-            args=(username,),
-            one=True
-        )['ct']
-        if userct == 1:
-            raise AuthenticationError("Invalid password")
-        else:
-            raise AuthenticationError("Invalid username")
+    # check if user exists
+    if not model.user_exists(username):
+        raise AuthenticationError("Invalid username")
+    elif not model.user_has_password(username, password):
+        raise AuthenticationError("Invalid password")
     # s'all good

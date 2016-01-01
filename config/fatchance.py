@@ -15,7 +15,8 @@ Usage:
 """
 
 # configuration
-DATABASE = '/tmp/fatchance.db'
+SQLALCHEMY_DATABASE_URI = 'postgresql://fatchance:fatchance@localhost/fatchance'
+SQLALCHEMY_TRACK_MODIFICATIONS = True
 DEBUG = True
 SECRET_KEY = 'development_key'
 USERNAME = 'admin'

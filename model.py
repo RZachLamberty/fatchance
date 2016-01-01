@@ -14,64 +14,110 @@ Usage:
 
 """
 
-import contextlib
+import datetime
 import flask
-import sqlite3
+import pandas as pd
+import sqlalchemy
 
 from fatchance import app
+from flask.ext.sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy(app)
+
+
+# ----------------------------- #
+#   constants                   #
+# ----------------------------- #
+
+INTEGRITY_ERROR = sqlalchemy.exc.IntegrityError
+TDY = datetime.datetime.now()
+
+
+# ----------------------------- #
+#   sql alchemy classes         #
+# ----------------------------- #
+
+class User(db.Model):
+    __tablename__ = 'users'
+    username = db.Column('username', db.TEXT, primary_key=True)
+    password = db.Column('password', db.TEXT)
+
+
+class Weighin(db.Model):
+    __tablename__ = 'weighins'
+    weighdate = db.Column('weighdate', db.DATE, primary_key=True, default=TDY)
+    username = db.Column(
+        'username', db.TEXT, db.ForeignKey('users.username'), primary_key=True
+    )
+    weight = db.Column('weight', db.REAL)
+
+    usernamerel = db.relationship('User', foreign_keys=username)
+
+
+# ----------------------------- #
+#   utility functions           #
+# ----------------------------- #
+
+def with_session(f, autocommit=True):
+    """ wrapper for session transactions """
+    def go(*args, **kw):
+        try:
+            ret = f(*args, **kw)
+            if autocommit:
+                db.session.commit()
+            return ret
+        except:
+            print "unable to commit session; rolling back"
+            db.session.rollback()
+            raise
+    return go
+
+
+@with_session
+def add_user(username, password):
+    u = User(username=username, password=password)
+    db.session.add(u)
+
+
+@with_session
+def user_exists(username):
+    return User.query.filter_by(username=username).count() == 1
+
+
+@with_session
+def user_has_password(username, password):
+    return User.query.filter_by(username=username, password=password
+    ).count() == 1
+
+
+@with_session
+def weighins():
+    return Weighin.query.order_by(
+        Weighin.username.desc(), Weighin.weighdate.desc()
+    ).all()
+
+
+@with_session
+def add_weighin(username, weighdate, weight):
+    w = Weighin(username=username, weighdate=weighdate, weight=weight)
+    db.session.add(w)
 
 
 # ----------------------------- #
 #   db stuff                    #
 # ----------------------------- #
 
-# making sure database exists
-def init_db():
-    with contextlib.closing(_connect_db()) as db:
-        with app.open_resource('sqlite_schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
+# play nice with pandas
+def q_as_dicts(res):
+    """ turn sqlalchemy results into a listdict """
+    return [
+        {k: v for (k, v) in row.items() if k != '_sa_instance_state'}
+        for row in res
+    ]
 
 
-# creating connections within a context
-def _connect_db():
-    return sqlite3.connect(app.config['DATABASE'])
-
-
-def get_db():
-    db = getattr(flask.g, '_database', None)
-    if db is None:
-        db = flask.g._database = _connect_db()
-        _set_row_factory()
-    return db
-
-
-# context manager
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(flask.g, '_database', None)
-    if db is not None:
-        db.close()
-
-
-# utilities for easier querying of the database
-def _set_row_factory():
-    flask.g._database.row_factory = _make_dicts
-
-
-def _make_dicts(cursor, row):
-    return {
-        cursor.description[idx][0]: value
-        for (idx, value) in enumerate(row)
-    }
-
-
-def query_db(query, args=(), one=False, commit=False):
-    con = get_db()
-    with con:
-        cur = con.execute(query, args)
-        rv = cur.fetchall()
-        if commit:
-            con.commit()
-        cur.close()
-    return (rv[0] if rv else None) if one else rv
+def q_as_df(res):
+    """ turn sqlalchemy results into a df """
+    return pd.DataFrame([row.__dict__ for row in res]).drop(
+        '_sa_instance_state', axis=1
+    )

@@ -24,9 +24,6 @@ import config.fatchance
 app = flask.Flask(__name__)
 app.config.from_object(config.fatchance)
 
-import auth
-import model
-
 from views import *
 
 # ----------------------------- #
