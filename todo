@@ -5,8 +5,8 @@
   + [DONE] extract all db stuff into models.py
   + [DONE] auth into its own file
 + [DONE] replace sqlite with postgres
-+ create postrgres bootstrap script
-+ do passwords the right way (salting, etc; use http://blog.codinghorror.com/youre-probably-storing-passwords-incorrectly/)
++ [DONE] create postrgres bootstrap script
++ [DONE] do passwords the right way (salting, etc; use http://blog.codinghorror.com/youre-probably-storing-passwords-incorrectly/)
 + update auth method(s)
 + update main page to have contest summary
 + create user-specific page for each user's total summary

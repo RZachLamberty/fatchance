@@ -40,7 +40,7 @@ TDY = datetime.datetime.now()
 class User(db.Model):
     __tablename__ = 'users'
     username = db.Column('username', db.TEXT, primary_key=True)
-    password = db.Column('password', db.TEXT)
+    hashpass = db.Column('hashpass', db.TEXT)
 
 
 class Weighin(db.Model):
@@ -74,20 +74,14 @@ def with_session(f, autocommit=True):
 
 
 @with_session
-def add_user(username, password):
-    u = User(username=username, password=password)
+def add_user(username, hashpass):
+    u = User(username=username, hashpass=hashpass)
     db.session.add(u)
 
 
 @with_session
-def user_exists(username):
-    return User.query.filter_by(username=username).count() == 1
-
-
-@with_session
-def user_has_password(username, password):
-    return User.query.filter_by(username=username, password=password
-    ).count() == 1
+def get_users_hashpass(username):
+    return User.query.filter_by(username=username).first().hashpass.encode('utf-8')
 
 
 @with_session

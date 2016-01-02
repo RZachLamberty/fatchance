@@ -14,6 +14,8 @@ Usage:
 
 """
 
+import bcrypt
+
 import model
 
 
@@ -27,17 +29,20 @@ class AuthenticationError(Exception):
 
 def add_user(username, password):
     try:
-        model.add_user(username, password)
+        model.add_user(
+            username=username,
+            hashpass=bcrypt.hashpw(password, bcrypt.gensalt())
+        )
     except model.INTEGRITY_ERROR:
-        raise AuthenticationError("That user name already exists")
+        raise AuthenticationError("Unable to add user! Try again.")
     except:
         raise
 
 
 def authenticate(username, password):
-    # check if user exists
-    if not model.user_exists(username):
-        raise AuthenticationError("Invalid username")
-    elif not model.user_has_password(username, password):
-        raise AuthenticationError("Invalid password")
+    # get user's hashed password and check it with bcrypt
+    hashpass = model.get_users_hashpass(username)
+
+    if not (bcrypt.hashpw(password.encode('utf-8'), hashpass) == hashpass):
+        raise AuthenticationError("Invalid username or password")
     # s'all good
