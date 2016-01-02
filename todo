@@ -7,10 +7,11 @@
 + [DONE] replace sqlite with postgres
 + [DONE] create postrgres bootstrap script
 + [DONE] do passwords the right way (salting, etc; use http://blog.codinghorror.com/youre-probably-storing-passwords-incorrectly/)
-+ update auth method(s)
++ [DONE] update auth method(s)
++ [DONE] better css (bootstrap that shit, mainly)
++ [DONE] default of the date form in show_weighins.html to today (look at http://stackoverflow.com/questions/6982692/html5-input-type-date-default-value-to-today)
++ [DONE] create user-specific page for each user's total summary
++ allow update to weight (instead of just unique key failure) [check out psql ON CONFLICT UPDATE]
 + update main page to have contest summary
-+ create user-specific page for each user's total summary
-+ better css (bootstrap that shit, mainly)
 + create way to wipe database
 + create nightly db bak script
-+ default of the date form in show_weighins.html to today (look at http://stackoverflow.com/questions/6982692/html5-input-type-date-default-value-to-today)

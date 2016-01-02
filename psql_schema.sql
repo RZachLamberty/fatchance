@@ -26,7 +26,7 @@ BEGIN;
     hashpass text
   );
 COMMIT;
-
+n
 -- create the weigh-in table
 BEGIN;
   CREATE TABLE weighins (

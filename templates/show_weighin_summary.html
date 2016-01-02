@@ -1,0 +1,6 @@
+{% extends "layout.html" %}
+{% block body %}
+<h3>Welcome, {{ session.username }}!</h3>
+<p>To update your own stats, head to <a href={{ url_for('show_user_home', username=session.username) }}>your home page</a></p>
+<p>Here lies summary stats!</p>
+{% endblock %}

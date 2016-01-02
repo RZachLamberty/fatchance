@@ -43,8 +43,8 @@ def add_weighin():
         weight=request.form['weight']
     )
 
-    flash('New entry was successfully posted')
-    return redirect(url_for('show_weighins'))
+    flash('New weighin recorded!', SUC)
+    return redirect(url_for('show_user_home', username=session.get('username')))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -52,23 +52,29 @@ def login():
     error = None
     if request.method == 'POST':
         try:
+            username = request.form['username']
             auth.authenticate(
-                username=request.form['username'],
+                username=username,
                 password=request.form['password']
             )
+            session['username'] = username
             session['logged_in'] = True
-            flash('You have been logged in')
-            return redirect(url_for('show_weighins'))
+            flash('You have been logged in, {}'.format(username), INF)
+            return redirect(url_for('show_weighin_summary'))
         except auth.AuthenticationError as error:
             error = error
-    return render_template('login.html', error=error)
+    return render_template(
+        'login.html',
+        name='login',
+        error=error
+    )
 
 
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
-    flash('You have been logged out')
-    return redirect(url_for('show_weighins'))
+    flash('You have been logged out', INF)
+    return redirect(url_for('show_weighin_summary'))
 
 
 @app.route('/new_user', methods=['GET', 'POST'])
@@ -84,8 +90,12 @@ def new_user():
                 password=request.form['password']
             )
             session['logged_in'] = True
-            flash('Your user name has been created!')
-            return redirect(url_for('show_weighins'))
+            flash('Your user name has been created', INF)
+            return redirect(url_for('show_weighin_summary'))
         except auth.AuthenticationError as error:
             error = error
-    return render_template('new_user.html', error=error)
+    return render_template(
+        'new_user.html',
+        name='new_user',
+        error=error
+    )
