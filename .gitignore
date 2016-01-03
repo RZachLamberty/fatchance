@@ -1,2 +1,4 @@
-static/css/bootstrap*
+static/css
+static/fonts
+static/js
 *.pyc
