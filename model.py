@@ -85,16 +85,42 @@ def get_users_hashpass(username):
 
 
 @with_session
-def weighins():
-    return Weighin.query.order_by(
+def weighins(username=None):
+    if username:
+        w = Weighin.query.filter_by(username=username)
+    else:
+        w = Weighin.query
+    return w.order_by(
         Weighin.username.desc(), Weighin.weighdate.desc()
     ).all()
 
 
 @with_session
 def add_weighin(username, weighdate, weight):
+    """ weighins can be done multiple times throughout a day, but we are only
+        allowing one per day in the db. Since I am using psql 9.3 (and no
+        'on conflict' syntax exists until 9.5), I m opting for the riskier
+        'try except update' approach. Check out this SO answer for more
+        details on how to change it in the future:
+            stackoverflow.com/a/17267423
+
+    """
+    try:
+        _insert_weighin(username, weighdate, weight)
+    except INTEGRITY_ERROR:
+        _update_weighin(username, weighdate, weight)
+
+
+@with_session
+def _insert_weighin(username, weighdate, weight):
     w = Weighin(username=username, weighdate=weighdate, weight=weight)
     db.session.add(w)
+
+
+@with_session
+def _update_weighin(username, weighdate, weight):
+    q = Weighin.query.filter_by(username=username, weighdate=weighdate)
+    q.update({Weighin.weight: weight})
 
 
 # ----------------------------- #

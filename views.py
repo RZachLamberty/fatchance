@@ -24,12 +24,42 @@ import model
 
 
 # ----------------------------- #
+#   constants                   #
+# ----------------------------- #
+
+# bootstrap alert classes for flashes
+SUC = 'success'
+INF = 'info'
+WAR = 'warning'
+DAN = 'danger'
+
+
+# ----------------------------- #
 #   views                       #
 # ----------------------------- #
 
 @app.route('/')
-def show_weighins():
-    return render_template('show_weighins.html', weighins=model.weighins())
+def show_weighin_summary():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return render_template(
+        'show_weighin_summary.html',
+        name='show_weighin_summary',
+        weighins=model.weighins()
+    )
+
+
+@app.route('/user/<username>')
+def show_user_home(username):
+    if not session.get('username') == username:
+        flash("You are not authorized to access this page!", DAN)
+        return redirect(url_for('show_weighin_summary'))
+    return render_template(
+        'show_user_weighins.html',
+        name='show_user_home',
+        weighins=model.weighins(username)
+    )
+    return 'user {}'.format(username)
 
 
 @app.route('/weighin', methods=['POST'])
